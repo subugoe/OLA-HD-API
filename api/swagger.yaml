@@ -1,0 +1,192 @@
+---
+swagger: "2.0"
+info:
+  description: "This is the API definition for the (OCR-D) OLA-HD Repository server.\
+    \ You can find out more about OLA-HD [http://ocr-d.de/modulprojekte#%20OLA-HD](http://ocr-d.de/modulprojekte#%20OLA-HD).\
+    \ For test purposes, you can use the api key `test-key` to test the authorization\
+    \     filters."
+  version: "1.0.0"
+  title: "OLA-HD Repository"
+  contact:
+    email: "panzer@sub.uni-goettingen.de"
+host: "127.0.0.1"
+basePath: "/lza"
+tags:
+- name: "lza_repo"
+  description: "OLA-HD API"
+schemes:
+- "https"
+- "http"
+paths:
+  /bag:
+    post:
+      tags:
+      - "bag"
+      summary: "Add a new Bag (SIP) to the repository. Service needs to check if the\
+        \ Object already exists in the repo."
+      description: "Operation creates a new Repository object."
+      operationId: "addBag"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "bagit_file"
+        in: "formData"
+        description: "Bag needs to be added to the repository"
+        required: true
+        type: "file"
+        x-exportParamName: "BagitFile"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SuccessImport"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag already exists."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      tags:
+      - "bag"
+      summary: "Update an existing Bag (SIP) in the repository. Service needs to check\
+        \ if the Object already exists in the repo."
+      description: "Operation updates a existing Repository object."
+      operationId: "updateBag"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "bagit_file"
+        in: "formData"
+        description: "Bag needs to be added to the repository"
+        required: true
+        type: "file"
+        x-exportParamName: "BagitFile"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SuccessImport"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+  /bag/{recordIdentifier}:
+    get:
+      tags:
+      - "bag"
+      summary: "Deletes a Bag (AIP) from the repository by record identfier."
+      description: "Operation serves a concrete Repository object."
+      operationId: "getBagById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/zip"
+      parameters:
+      - name: "recordIdentifier"
+        in: "path"
+        description: "Record Identifier of Bag needs to be deleted."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordIdentifier"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "file"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+      - "bag"
+      summary: "Deletes a Bag (AIP) from the repository by record identfier."
+      description: "Operation deletes a concrete Repository object."
+      operationId: "deleteBagById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "recordIdentifier"
+        in: "path"
+        description: "Record Identifier of Bag needs to be deleted."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordIdentifier"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/SuccessDeletion"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  Error:
+    type: "object"
+    required:
+    - "code"
+    - "message"
+    properties:
+      code:
+        type: "string"
+      message:
+        type: "string"
+  SuccessImport:
+    type: "object"
+    required:
+    - "id"
+    - "url"
+    - "version"
+    properties:
+      id:
+        type: "string"
+      url:
+        type: "string"
+      new:
+        type: "boolean"
+      version:
+        type: "string"
+    example:
+      new: true
+      id: "id"
+      version: "version"
+      url: "url"
+  SuccessDeletion:
+    type: "object"
+    required:
+    - "id"
+    properties:
+      id:
+        type: "string"
+    example:
+      id: "id"
