@@ -11,4 +11,13 @@
     * Expectations
         * A file my_bag.zip in the working directory
         * Server is already runnning
+### View API
+* Open another terminal window, and switch to the project root
+    * $> ./start.sh
+* open: http://localhost
+    * select: File > Clear editor
+    * Copy the spec to the editor 
+        * spec: project_root > api > swagger.ymal
+    
+
     
