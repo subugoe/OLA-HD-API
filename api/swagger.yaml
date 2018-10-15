@@ -9,7 +9,7 @@ info:
   title: "OLA-HD Repository"
   contact:
     email: "panzer@sub.uni-goettingen.de"
-host: "127.0.0.1"
+host: "127.0.0.1:8081"
 basePath: "/lza"
 tags:
 - name: "lza_repo"
@@ -19,6 +19,47 @@ schemes:
 - "http"
 paths:
   /bag:
+    get:
+      tags:
+      - "bag"
+      summary: "Returns a list of all Bags (AIPs) in the repository. The list supports\
+        \ paging."
+      description: "Operation serves a list of repository objects."
+      operationId: "getBagList"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/zip"
+      parameters:
+      - name: "pageSize"
+        in: "query"
+        description: "Number of persons returned"
+        required: false
+        type: "integer"
+        x-exportParamName: "PageSize"
+      - name: "pageNumber"
+        in: "query"
+        description: "Page number"
+        required: false
+        type: "integer"
+        x-exportParamName: "PageNumber"
+      responses:
+        200:
+          description: "A list og Bags."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/inline_response_200"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
     post:
       tags:
       - "bag"
@@ -85,24 +126,25 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/Error"
-  /bag/{recordIdentifier}:
+  /bag/{recordId}:
     get:
       tags:
       - "bag"
-      summary: "Deletes a Bag (AIP) from the repository by record identfier."
-      description: "Operation serves a concrete Repository object."
+      summary: "Returns th latest Bag version (AIP) from the repository by record\
+        \ identfier."
+      description: "Operation serves a concrete repository object."
       operationId: "getBagById"
       consumes:
       - "application/json"
       produces:
       - "application/zip"
       parameters:
-      - name: "recordIdentifier"
+      - name: "recordId"
         in: "path"
-        description: "Record Identifier of Bag needs to be deleted."
+        description: "Record Identifier of Bag to download."
         required: true
         type: "string"
-        x-exportParamName: "RecordIdentifier"
+        x-exportParamName: "RecordId"
       responses:
         200:
           description: "successful operation"
@@ -122,19 +164,19 @@ paths:
       tags:
       - "bag"
       summary: "Deletes a Bag (AIP) from the repository by record identfier."
-      description: "Operation deletes a concrete Repository object."
+      description: "Operation deletes a concrete repository object."
       operationId: "deleteBagById"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - name: "recordIdentifier"
+      - name: "recordId"
         in: "path"
         description: "Record Identifier of Bag needs to be deleted."
         required: true
         type: "string"
-        x-exportParamName: "RecordIdentifier"
+        x-exportParamName: "RecordId"
       responses:
         200:
           description: "successful operation"
@@ -146,6 +188,212 @@ paths:
             $ref: "#/definitions/Error"
         404:
           description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+  /bag/{recordId}/versions:
+    get:
+      tags:
+      - "bag"
+      summary: "Returns a list of all versions for a specific Bag (AIP)."
+      description: "Operation serves a list of versions for a repository object."
+      operationId: "getBagVersionsListById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "recordId"
+        in: "path"
+        description: "Record Identifier of the Bag in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordId"
+      responses:
+        200:
+          description: "A list og Bags."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/inline_response_200_1"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+  /bag/{recordId}/{versionId}:
+    get:
+      tags:
+      - "bag"
+      summary: "Returns a specific Bag version (AIP) from the repository by record\
+        \ identfier and version id."
+      description: "Operation serves a concrete version for a repository object."
+      operationId: "getBagVersionById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/zip"
+      parameters:
+      - name: "recordId"
+        in: "path"
+        description: "Record Identifier of the Bag in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordId"
+      - name: "versionId"
+        in: "path"
+        description: "The identifier of the version."
+        required: true
+        type: "string"
+        x-exportParamName: "VersionId"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "file"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag version not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+  /search/{searchterm}:
+    get:
+      tags:
+      - "search"
+      summary: "Returns a list of hits."
+      description: "Returns a list of hits (Bag ids) for the passed search term."
+      operationId: "searchBagsBySearchterm"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "searchterm"
+        in: "path"
+        description: "Term to search."
+        required: true
+        type: "string"
+        x-exportParamName: "Searchterm"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/inline_response_200_2"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag version not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+  /content/{recordId}/{versionId}:
+    get:
+      tags:
+      - "content"
+      summary: "Returns a content list for a specific Bag (AIP) version."
+      description: "Operation serves a list of enclosed content for a repository object.\
+        \ The list is separated by METS file group \"USE\" groups (e.g. \"OCR-D-IMG\"\
+        , \"OCR-D-OCR-ANY\", etc.)"
+      operationId: "getFileListById"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "recordId"
+        in: "path"
+        description: "Record Identifier of the Bag in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordId"
+      - name: "versionId"
+        in: "path"
+        description: "The identifier of the version."
+        required: true
+        type: "string"
+        x-exportParamName: "VersionId"
+      responses:
+        200:
+          description: "A list of Bags."
+          schema:
+            $ref: "#/definitions/inline_response_200_3"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+      externalDocs:
+        description: "See OCRD METS requirements on handling METS/PAGE"
+        url: "https://ocr-d.github.io/mets"
+  /content/{recordId}/{versionId}/{fileGrpUseId}/{fileId}:
+    get:
+      tags:
+      - "content"
+      summary: "Returns a content file for a spcific Bag version (AIP) from the repository."
+      description: "Operation serves a concrete version for a repository object."
+      operationId: "getFileByIds"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/xml"
+      parameters:
+      - name: "recordId"
+        in: "path"
+        description: "Record Identifier of the Bag in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordId"
+      - name: "fileGrpUseId"
+        in: "path"
+        description: "Name of file group (USE attribute), related to the requested\
+          \ file."
+        required: true
+        type: "string"
+        x-exportParamName: "FileGrpUseId"
+      - name: "fileId"
+        in: "path"
+        description: "The name of the file in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "FileId"
+      - name: "versionId"
+        in: "path"
+        description: "The identifier of the version."
+        required: true
+        type: "string"
+        x-exportParamName: "VersionId"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "file"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag version not found."
         405:
           description: "Invalid input"
           schema:
@@ -190,3 +438,76 @@ definitions:
         type: "string"
     example:
       id: "id"
+  inline_response_200:
+    required:
+    - "recordId"
+    properties:
+      recordId:
+        type: "string"
+      title:
+        type: "string"
+  inline_response_200_1:
+    required:
+    - "recordId"
+    - "versionId"
+    properties:
+      recordId:
+        type: "string"
+      versionId:
+        type: "string"
+    example:
+      recordId: "recordId"
+      versionId: "versionId"
+  inline_response_200_2:
+    required:
+    - "recordId"
+    - "title"
+    properties:
+      recordId:
+        type: "string"
+      title:
+        type: "string"
+    example:
+      recordId: "recordId"
+      title: "title"
+  inline_response_200_3_fileIds:
+    properties:
+      fileId:
+        type: "string"
+    example:
+      fileId: "fileId"
+  inline_response_200_3_fileGrps:
+    properties:
+      fileGrp:
+        type: "string"
+      fileIds:
+        type: "array"
+        items:
+          $ref: "#/definitions/inline_response_200_3_fileIds"
+    example:
+      fileGrp: "fileGrp"
+      fileIds:
+      - fileId: "fileId"
+      - fileId: "fileId"
+  inline_response_200_3:
+    properties:
+      recordId:
+        type: "string"
+      versionId:
+        type: "string"
+      fileGrps:
+        type: "array"
+        items:
+          $ref: "#/definitions/inline_response_200_3_fileGrps"
+    example:
+      recordId: "recordId"
+      versionId: "versionId"
+      fileGrps:
+      - fileGrp: "fileGrp"
+        fileIds:
+        - fileId: "fileId"
+        - fileId: "fileId"
+      - fileGrp: "fileGrp"
+        fileIds:
+        - fileId: "fileId"
+        - fileId: "fileId"

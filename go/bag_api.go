@@ -15,7 +15,7 @@ import (
 	"net/http"
 	"os"
 	"io"
-	"io/ioutil"
+	//"io/ioutil"
 )
 
 // curl -X POST http://127.0.0.1:8081/lza/bag -F "bagit_file=@bagit-v4.12.3.zip" -vvv
@@ -39,43 +39,35 @@ func AddBag(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-
-//curl -X DELETE http://127.0.0.1:8081/lza/bag/4711
+// curl -X DELETE http://127.0.0.1:8081/lza/bag/4711
 func DeleteBagById(w http.ResponseWriter, r *http.Request) {
-
-	var err = os.Remove("./1_bagit-v4.12.3.zip")
-	if err != nil { return }
-
-	err = os.Remove("./2_bagit-v4.12.3.zip")
-	if err != nil { return }
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 }
 
 // curl -X GET http://127.0.0.1:8081/lza/bag/4711 > a.zip
 func GetBagById(w http.ResponseWriter, r *http.Request) {
-
-	result, _:= ioutil.ReadFile("./1_bagit-v4.12.3.zip")
-
-	w.Header().Set("Content-Type", "application/zip")
-	w.WriteHeader(http.StatusOK)
-	w.Write(result)
-
-}
-
-curl -X PUT http://127.0.0.1:8081/lza/bag -F "bagit_file=@bagit-v4.12.3.zip" -vvv
-func UpdateBag(w http.ResponseWriter, r *http.Request) {
-
-	file, handler, _:= r.FormFile("bagit_file")
-	defer file.Close()
-
-	// copy example
-	f, _ := os.OpenFile("./2_"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-	defer f.Close()
-	io.Copy(f, file)
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+}
 
+func GetBagList(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetBagVersionById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetBagVersionsListById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+// curl -X PUT http://127.0.0.1:8081/lza/bag -F "bagit_file=@bagit-v4.12.3.zip" -vvv
+func UpdateBag(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 }

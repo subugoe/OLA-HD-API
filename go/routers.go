@@ -49,12 +49,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 var routes = Routes{
-	//Route{
-	//	"Index",
-	//	"GET",
-	//	"/lza/",
-	//	Index,
-	//},
+	Route{
+		"Index",
+		"GET",
+		"/lza/",
+		Index,
+	},
 
 	Route{
 		"AddBag",
@@ -66,15 +66,36 @@ var routes = Routes{
 	Route{
 		"DeleteBagById",
 		strings.ToUpper("Delete"),
-		"/lza/bag/{recordIdentifier}",
+		"/lza/bag/{recordId}",
 		DeleteBagById,
 	},
 
 	Route{
 		"GetBagById",
 		strings.ToUpper("Get"),
-		"/lza/bag/{recordIdentifier}",
+		"/lza/bag/{recordId}",
 		GetBagById,
+	},
+
+	Route{
+		"GetBagList",
+		strings.ToUpper("Get"),
+		"/lza/bag",
+		GetBagList,
+	},
+
+	Route{
+		"GetBagVersionById",
+		strings.ToUpper("Get"),
+		"/lza/bag/{recordId}/{versionId}",
+		GetBagVersionById,
+	},
+
+	Route{
+		"GetBagVersionsListById",
+		strings.ToUpper("Get"),
+		"/lza/bag/{recordId}/versions",
+		GetBagVersionsListById,
 	},
 
 	Route{
@@ -82,5 +103,26 @@ var routes = Routes{
 		strings.ToUpper("Put"),
 		"/lza/bag",
 		UpdateBag,
+	},
+
+	Route{
+		"GetFileByIds",
+		strings.ToUpper("Get"),
+		"/lza/content/{recordId}/{versionId}/{fileGrpUseId}/{fileId}",
+		GetFileByIds,
+	},
+
+	Route{
+		"GetFileListById",
+		strings.ToUpper("Get"),
+		"/lza/content/{recordId}/{versionId}",
+		GetFileListById,
+	},
+
+	Route{
+		"SearchBagsBySearchterm",
+		strings.ToUpper("Get"),
+		"/lza/search/{searchterm}",
+		SearchBagsBySearchterm,
 	},
 }
