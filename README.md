@@ -5,7 +5,7 @@
         * Golang is installed on the system
         * GO "mux" package is installed
             * $> go install mux
-### Test the endpoint "lza/bag" (HTTP POST) endpoint
+### Test the endpoint "lza/bag" (HTTP POST) 
 * Open another terminal window
     * $> curl -X POST http://127.0.0.1:8080/lza/bag -F "bagit_file=@my_bag.zip" -vvv
     * Expectations
