@@ -6,10 +6,10 @@ info:
     \ For test purposes, you can use the api key `test-key` to test the authorization\
     \     filters."
   version: "1.0.0"
-  title: "OLA-HD Repository"
+  title: "OLA-HD Repository API"
   contact:
     email: "panzer@sub.uni-goettingen.de"
-host: "127.0.0.1:8081"
+host: "127.0.0.1:8080"
 basePath: "/lza"
 tags:
 - name: "lza_repo"
@@ -63,8 +63,9 @@ paths:
     post:
       tags:
       - "bag"
-      summary: "Add a new Bag (SIP) to the repository. Service needs to check if the\
-        \ Object already exists in the repo."
+      summary: "Add a new Bag (SIP) to the repository. I already in the repository,\
+        \ an new version will be created. So the service needs to check if the object\
+        \ is already in the repo."
       description: "Operation creates a new Repository object."
       operationId: "addBag"
       consumes:
@@ -93,44 +94,11 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/Error"
-    put:
-      tags:
-      - "bag"
-      summary: "Update an existing Bag (SIP) in the repository. Service needs to check\
-        \ if the Object already exists in the repo."
-      description: "Operation updates a existing Repository object."
-      operationId: "updateBag"
-      consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "bagit_file"
-        in: "formData"
-        description: "Bag needs to be added to the repository"
-        required: true
-        type: "file"
-        x-exportParamName: "BagitFile"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/SuccessImport"
-        401:
-          description: "Authorization information is missing or invalid."
-          schema:
-            $ref: "#/definitions/Error"
-        404:
-          description: "Bag not found."
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
   /bag/{recordId}:
     get:
       tags:
       - "bag"
-      summary: "Returns th latest Bag version (AIP) from the repository by record\
+      summary: "Returns the latest Bag version (AIP) from the repository by record\
         \ identfier."
       description: "Operation serves a concrete repository object."
       operationId: "getBagById"
@@ -150,38 +118,6 @@ paths:
           description: "successful operation"
           schema:
             type: "file"
-        401:
-          description: "Authorization information is missing or invalid."
-          schema:
-            $ref: "#/definitions/Error"
-        404:
-          description: "Bag not found."
-        405:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
-    delete:
-      tags:
-      - "bag"
-      summary: "Deletes a Bag (AIP) from the repository by record identfier."
-      description: "Operation deletes a concrete repository object."
-      operationId: "deleteBagById"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "recordId"
-        in: "path"
-        description: "Record Identifier of Bag needs to be deleted."
-        required: true
-        type: "string"
-        x-exportParamName: "RecordId"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/SuccessDeletion"
         401:
           description: "Authorization information is missing or invalid."
           schema:
@@ -267,13 +203,54 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/Error"
-  /search/{searchterm}:
+  /search/metadata:
     get:
       tags:
       - "search"
-      summary: "Returns a list of hits."
-      description: "Returns a list of hits (Bag ids) for the passed search term."
-      operationId: "searchBagsBySearchterm"
+      summary: "Performs a metsdata based search."
+      description: "Performs a metadata serach and returns a list of documents that\
+        \ contains the search term. The list contains paths to the matching file (\\\
+        <host\\>/\\<basepath\\>/content/\\<recordId\\>/\\<versionId\\>/\\<fileGrpUseId\\\
+        >/\\<fileId\\>)"
+      operationId: "searchContentByMetadata"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "title"
+        in: "query"
+        description: "Work title to search."
+        required: false
+        type: "string"
+        x-exportParamName: "Title"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/inline_response_200_2"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag version not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+  /search/fulltext/{searchterm}:
+    get:
+      tags:
+      - "search"
+      summary: "Performs a fulltext search."
+      description: "Performs a fulltext search and returns a list of documents that\
+        \ contains the search term. The list contains paths to the matching file (\\\
+        <host\\>/\\<basepath\\>/content/\\<recordId\\>/\\<versionId\\>/\\<fileGrpUseId\\\
+        >/\\<fileId\\>), text snippets and the work titel"
+      operationId: "searchContentBySearchterm"
       consumes:
       - "application/json"
       produces:
@@ -346,6 +323,54 @@ paths:
       externalDocs:
         description: "See OCRD METS requirements on handling METS/PAGE"
         url: "https://ocr-d.github.io/mets"
+  /content/{recordId}/all/{fileGrpUseId}/{fileId}:
+    get:
+      tags:
+      - "content"
+      summary: "Returns all content file versions."
+      description: "Operation serves all file versions as Bag. The file names are\
+        \ constructed by concatenating the file id with the version number (\\<fileId\\\
+        >_\\<version_number\\>.\\<extension\\>)"
+      operationId: "getFileVersionsByIds"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/zip"
+      parameters:
+      - name: "recordId"
+        in: "path"
+        description: "Record Identifier of the Bag in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "RecordId"
+      - name: "fileGrpUseId"
+        in: "path"
+        description: "Name of file group (USE attribute), related to the requested\
+          \ file."
+        required: true
+        type: "string"
+        x-exportParamName: "FileGrpUseId"
+      - name: "fileId"
+        in: "path"
+        description: "The name of the file in focus."
+        required: true
+        type: "string"
+        x-exportParamName: "FileId"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "file"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "Bag version not found."
+        405:
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
   /content/{recordId}/{versionId}/{fileGrpUseId}/{fileId}:
     get:
       tags:
@@ -412,11 +437,11 @@ definitions:
   SuccessImport:
     type: "object"
     required:
-    - "id"
+    - "recordId"
     - "url"
     - "version"
     properties:
-      id:
+      recordId:
         type: "string"
       url:
         type: "string"
@@ -426,18 +451,9 @@ definitions:
         type: "string"
     example:
       new: true
-      id: "id"
+      recordId: "PPN4711"
       version: "version"
       url: "url"
-  SuccessDeletion:
-    type: "object"
-    required:
-    - "id"
-    properties:
-      id:
-        type: "string"
-    example:
-      id: "id"
   inline_response_200:
     required:
     - "recordId"
@@ -448,6 +464,7 @@ definitions:
         type: "string"
   inline_response_200_1:
     required:
+    - "premisInfo"
     - "recordId"
     - "versionId"
     properties:
@@ -455,20 +472,31 @@ definitions:
         type: "string"
       versionId:
         type: "string"
+      premisInfo:
+        type: "array"
+        items:
+          $ref: "#/definitions/inline_response_200_1_premisInfo"
     example:
       recordId: "recordId"
       versionId: "versionId"
+      premisInfo:
+        type: "type"
+        identifier: "identifier"
+        todo: {}
   inline_response_200_2:
     required:
-    - "recordId"
     - "title"
+    - "url"
     properties:
-      recordId:
+      url:
+        type: "string"
+      snippet:
         type: "string"
       title:
         type: "string"
     example:
-      recordId: "recordId"
+      url: "url"
+      snippet: "snippet"
       title: "title"
   inline_response_200_3_fileIds:
     properties:
@@ -511,3 +539,12 @@ definitions:
         fileIds:
         - fileId: "fileId"
         - fileId: "fileId"
+  inline_response_200_1_premisInfo:
+    properties:
+      type:
+        type: "string"
+      identifier:
+        type: "string"
+      todo:
+        type: "object"
+        properties: {}

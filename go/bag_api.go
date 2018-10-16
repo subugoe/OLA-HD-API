@@ -1,5 +1,5 @@
 /*
- * OLA-HD Repository
+ * OLA-HD Repository API
  *
  * This is the API definition for the (OCR-D) OLA-HD Repository server. You can find out more about OLA-HD [http://ocr-d.de/modulprojekte#%20OLA-HD](http://ocr-d.de/modulprojekte#%20OLA-HD). For test purposes, you can use the api key `test-key` to test the authorization     filters.
  *
@@ -39,12 +39,6 @@ func AddBag(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// curl -X DELETE http://127.0.0.1:8081/lza/bag/4711
-func DeleteBagById(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}
-
 // curl -X GET http://127.0.0.1:8081/lza/bag/4711 > a.zip
 func GetBagById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -62,12 +56,6 @@ func GetBagVersionById(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBagVersionsListById(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}
-
-// curl -X PUT http://127.0.0.1:8081/lza/bag -F "bagit_file=@bagit-v4.12.3.zip" -vvv
-func UpdateBag(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 }

@@ -1,5 +1,5 @@
 /*
- * OLA-HD Repository
+ * OLA-HD Repository API
  *
  * This is the API definition for the (OCR-D) OLA-HD Repository server. You can find out more about OLA-HD [http://ocr-d.de/modulprojekte#%20OLA-HD](http://ocr-d.de/modulprojekte#%20OLA-HD). For test purposes, you can use the api key `test-key` to test the authorization     filters.
  *
@@ -20,6 +20,11 @@ func GetFileByIds(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetFileListById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetFileVersionsByIds(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 }

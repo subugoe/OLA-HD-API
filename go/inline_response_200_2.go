@@ -1,5 +1,5 @@
 /*
- * OLA-HD Repository
+ * OLA-HD Repository API
  *
  * This is the API definition for the (OCR-D) OLA-HD Repository server. You can find out more about OLA-HD [http://ocr-d.de/modulprojekte#%20OLA-HD](http://ocr-d.de/modulprojekte#%20OLA-HD). For test purposes, you can use the api key `test-key` to test the authorization     filters.
  *
@@ -12,7 +12,9 @@ package swagger
 
 type InlineResponse2002 struct {
 
-	RecordId string `json:"recordId"`
+	Url string `json:"url"`
+
+	Snippet string `json:"snippet,omitempty"`
 
 	Title string `json:"title"`
 }

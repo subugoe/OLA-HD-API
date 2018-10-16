@@ -1,5 +1,5 @@
 /*
- * OLA-HD Repository
+ * OLA-HD Repository API
  *
  * This is the API definition for the (OCR-D) OLA-HD Repository server. You can find out more about OLA-HD [http://ocr-d.de/modulprojekte#%20OLA-HD](http://ocr-d.de/modulprojekte#%20OLA-HD). For test purposes, you can use the api key `test-key` to test the authorization     filters.
  *
@@ -49,25 +49,18 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 var routes = Routes{
-	Route{
-		"Index",
-		"GET",
-		"/lza/",
-		Index,
-	},
+	//Route{
+	//	"Index",
+	//	"GET",
+	//	"/lza/",
+	//	Index,
+	//},
 
 	Route{
 		"AddBag",
 		strings.ToUpper("Post"),
 		"/lza/bag",
 		AddBag,
-	},
-
-	Route{
-		"DeleteBagById",
-		strings.ToUpper("Delete"),
-		"/lza/bag/{recordId}",
-		DeleteBagById,
 	},
 
 	Route{
@@ -99,13 +92,6 @@ var routes = Routes{
 	},
 
 	Route{
-		"UpdateBag",
-		strings.ToUpper("Put"),
-		"/lza/bag",
-		UpdateBag,
-	},
-
-	Route{
 		"GetFileByIds",
 		strings.ToUpper("Get"),
 		"/lza/content/{recordId}/{versionId}/{fileGrpUseId}/{fileId}",
@@ -120,9 +106,23 @@ var routes = Routes{
 	},
 
 	Route{
-		"SearchBagsBySearchterm",
+		"GetFileVersionsByIds",
 		strings.ToUpper("Get"),
-		"/lza/search/{searchterm}",
-		SearchBagsBySearchterm,
+		"/lza/content/{recordId}/all/{fileGrpUseId}/{fileId}",
+		GetFileVersionsByIds,
+	},
+
+	Route{
+		"SearchContentByMetadata",
+		strings.ToUpper("Get"),
+		"/lza/search/metadata",
+		SearchContentByMetadata,
+	},
+
+	Route{
+		"SearchContentBySearchterm",
+		strings.ToUpper("Get"),
+		"/lza/search/fulltext/{searchterm}",
+		SearchContentBySearchterm,
 	},
 }
